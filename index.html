@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CSS and JS Clock</title>
+  </head>
+  <body>
+    <div class="clock">
+      <div class="clock-face">
+        <div class="hand hour-hand"></div>
+        <div class="hand min-hand"></div>
+        <div class="hand second-hand"></div>
+      </div>
+    </div>
+
+    <style>
+      html {
+        background: #018ded;
+        background-size: cover;
+        font-family: "helvetica neue";
+        text-align: center;
+        font-size: 10px;
+      }
+      body {
+        margin: 0;
+        font-size: 2rem;
+        display: flex;
+        flex: 1;
+        min-height: 100vh;
+        align-items: center;
+      }
+      .clock {
+        position: absolute;
+        transform: translate(50%, -50%);
+        width: 30rem;
+        height: 30rem;
+        border: 20px solid white;
+        border-radius: 50%;
+        margin: 50px auto;
+        padding: 2rem;
+        box-shadow: 0 0 0 4px rgba(0, 0, 0, 0.1), inset 0 0 0 3px #efefef,
+          inset 0 0 10px black, 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+      .clock-face {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform: translateY(
+          -3px
+        ); /* account for the height of the clock hands */
+      }
+      .hand {
+        width: 50%;
+        height: 6px;
+        background: black;
+        position: absolute;
+        top: 50%;
+        transform-origin: 100%;
+        transform: rotate(90deg);
+        transition: transform 0.05s cubic-bezier(0.9, 0.03, 0.11, 2.42);
+        border-radius: 5px;
+      }
+
+      .second-hand {
+        background: thistle;
+      }
+
+      .min-hand {
+        background: lightgoldenrodyellow;
+      }
+    </style>
+
+    <script>
+      class Clock {
+        constructor(seconds, minutes, hours) {
+          this.seconds = seconds;
+          this.minutes = minutes;
+          this.hours = hours;
+        }
+
+        /**
+         * type CssClass = '.second-hand' | '.min-hand' | '.hour-hand'
+         * transformHands(cssClass : CssClass): void
+         **/
+        transformHand(cssClass) {
+          let currentRotation = 0;
+
+          const hand = document.querySelector(cssClass);
+          if (cssClass === ".hour-hand") {
+            const rotationSpeed = 360 / 12;
+            this.hours = new Date().getHours() % 12;
+            currentRotation = this.hours * rotationSpeed + 90;
+          }
+
+          if (cssClass === ".min-hand") {
+            const rotationSpeed = 360 / 60;
+            this.minutes = new Date().getMinutes();
+            currentRotation = this.minutes * rotationSpeed + 90;
+          }
+
+          if (cssClass === ".second-hand") {
+            const rotationSpeed = 360 / 60;
+            this.seconds = new Date().getSeconds();
+            currentRotation = this.seconds * rotationSpeed + 90;
+          }
+
+          hand.style.transform = `rotate(${currentRotation}deg)`;
+        }
+
+        setTransform() {
+          if (this.seconds !== new Date().getSeconds()) {
+            this.transformHand(".second-hand");
+          }
+
+          if (this.minutes !== new Date().getMinutes()) {
+            this.transformHand(".min-hand");
+          }
+
+          if (this.hours !== new Date().getHours() % 12) {
+            this.transformHand(".hour-hand");
+          }
+        }
+
+        init() {
+          this.transformHand(".second-hand");
+          this.transformHand(".min-hand");
+          this.transformHand(".hour-hand");
+        }
+
+        start() {
+          this.init();
+          setInterval(() => {
+            return this.setTransform();
+          }, 1000);
+        }
+      }
+      const seconds = new Date().getSeconds();
+      const minutes = new Date().getMinutes();
+      const hours = new Date().getHours() % 12;
+
+      const myClock = new Clock(seconds, minutes, hours);
+
+      myClock.start();
+    </script>
+  </body>
+</html>
